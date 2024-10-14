@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Initialize with 25 rooms if not found
     setState(() {
       rooms = List.generate(
-          25,
+          23,
           (index) => Room(
                 roomNumber: (index + 1).toString(),
                 tenantName: 'Tenant ${index + 1}',
@@ -60,6 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  TextEditingController searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     List<Room> filteredRooms = rooms
@@ -79,6 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
             return room.dueAmount == 4000;
           case 6000:
             return room.dueAmount > 6000;
+          case -1:
+            return room.dueAmount >= 0;
           default:
             return true;
         }
@@ -86,11 +90,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 255, 201, 140),
       appBar: AppBar(
         title: Text('Rooms'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add),
+          ElevatedButton(
+            child: Text(
+              'Add Rent',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+            ),
             onPressed: () {
               setState(() {
                 rooms.forEach((room) {
@@ -123,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 DropdownMenuItem(child: Text('Due 2000'), value: 2000),
                 DropdownMenuItem(child: Text('Due 4000'), value: 4000),
                 DropdownMenuItem(child: Text('Due > 6000'), value: 6000),
+                DropdownMenuItem(child: Text('Clear Filter'), value: -1),
               ],
               onChanged: (value) {
                 setState(() {
@@ -130,17 +142,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
             ),
+            ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    rooms.forEach((room) {
+                      room.dueAmount = 0;
+                    });
+                  });
+                },
+                child: const Text('Remove Rent')),
             Expanded(
               child: ListView.builder(
                 itemCount: filteredRooms.length,
                 itemBuilder: (context, index) {
                   Room room = filteredRooms[index];
                   return Card(
-                    color: room.dueAmount == 0 ? Colors.green : Colors.red,
+                    color: Color.fromARGB(255, 229, 229, 229),
                     child: ListTile(
                       title: Text('Room ${room.roomNumber}'),
-                      subtitle: Text(
-                          'Tenant: ${room.tenantName} \nDue: ₹${room.dueAmount}'),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Tenant: ${room.tenantName} '),
+                          Text(
+                            'Due: ₹${room.dueAmount}',
+                            style: TextStyle(
+                                color: room.dueAmount == 0
+                                    ? Colors.green
+                                    : Colors.red),
+                          ),
+                        ],
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,

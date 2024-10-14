@@ -26,6 +26,7 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool show = widget.room.dueAmount > 0 ? true : false;
     return Scaffold(
       appBar: AppBar(
         title: Text('Room ${widget.room.roomNumber} Details'),
@@ -56,6 +57,8 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
                         setState(() {
                           widget.room.tenantName = updatedRoom.tenantName;
                           widget.room.tenantContact = updatedRoom.tenantContact;
+                          widget.room.rentAmount = updatedRoom.rentAmount;
+                          widget.room.dueAmount = updatedRoom.dueAmount;
                           saveRooms(); // Save changes
                         });
                       },
@@ -81,15 +84,17 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  widget.room.markAsPaid(widget.room.rentAmount);
-                  saveRooms();
-                });
-              },
-              child: Text('Mark as Paid'),
-            ),
+            show
+                ? ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.room.markAsPaid(widget.room.rentAmount);
+                        saveRooms();
+                      });
+                    },
+                    child: Text('Mark as Paid'),
+                  )
+                : SizedBox.shrink(),
           ],
         ),
       ),
